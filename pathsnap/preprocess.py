@@ -20,7 +20,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from pathsnap.data_io import Trip
+from pathsnap.data_io import InferenceTrip, Trip
 from pathsnap.geo import Projector, haversine_m, segment_bearings
 
 GAP_SPLIT_S = 30.0       # Δt above this starts a new trajectory segment
@@ -64,9 +64,14 @@ class ProcessedTrip:
 
 
 def preprocess_trip(
-    trip: Trip, gap_split_s: float = GAP_SPLIT_S, speed_flag_ms: float = SPEED_FLAG_MS
+    trip: Trip | InferenceTrip,
+    gap_split_s: float = GAP_SPLIT_S,
+    speed_flag_ms: float = SPEED_FLAG_MS,
 ) -> ProcessedTrip:
-    """Build a :class:`ProcessedTrip` from a raw :class:`Trip` (read-only)."""
+    """Build a projected view from raw trip data (read-only).
+
+    ``InferenceTrip`` is supported so prediction never needs a reference route.
+    """
     lon, lat, ts = trip.track[:, 0], trip.track[:, 1], trip.track[:, 2]
     proj = Projector.for_points(lon, lat)
     xy = proj.xy(lon, lat)
@@ -78,19 +83,23 @@ def preprocess_trip(
     seg_m[1:] = haversine_m(lon[:-1], lat[:-1], lon[1:], lat[1:])
     with np.errstate(invalid="ignore", divide="ignore"):
         speed = seg_m / dt
-    is_outlier = np.zeros(len(ts), dtype=bool)
-    is_outlier[1:] = np.nan_to_num(speed[1:], nan=0.0) > speed_flag_ms
 
     # Segmentation at large gaps.
     segment_id = np.zeros(len(ts), dtype=int)
+    breaks = np.zeros(len(ts), dtype=bool)
     if len(ts) > 1:
         breaks = np.nan_to_num(dt, nan=0.0) > gap_split_s
         segment_id = np.cumsum(breaks).astype(int)
+        speed[breaks] = np.nan
+
+    is_outlier = np.zeros(len(ts), dtype=bool)
+    is_outlier[1:] = np.nan_to_num(speed[1:], nan=0.0) > speed_flag_ms
 
     # Planar heading to previous point.
     heading = np.full(len(ts), np.nan)
     if len(ts) > 1:
         heading[1:] = np.arctan2(xy[1:, 1] - xy[:-1, 1], xy[1:, 0] - xy[:-1, 0])
+        heading[breaks] = np.nan
 
     # Directed arc geometry (original arc_id == row index preserved).
     node_xy = proj.xy(trip.nodes[:, 0], trip.nodes[:, 1])

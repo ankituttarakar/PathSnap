@@ -13,6 +13,7 @@ No raw data is modified; labels are derived from .route for training only.
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -60,12 +61,22 @@ def build_partition(partition: str) -> tuple[pd.DataFrame, pd.DataFrame]:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--partitions",
+        nargs="+",
+        choices=("train", "student_test"),
+        default=("train", "student_test"),
+        help="Partitions to process; build train first and student_test only for final evaluation.",
+    )
+    args = parser.parse_args()
+
     CONFIG.paths.ensure_output_dirs()
     out = CONFIG.paths.data_processed
     out.mkdir(parents=True, exist_ok=True)
     eda = CONFIG.paths.outputs_eda
 
-    for partition in ("train", "student_test"):
+    for partition in args.partitions:
         feats, diag = build_partition(partition)
         joblib.dump(feats, out / f"features_{partition}.pkl", compress=3)
         diag.to_csv(eda / f"dataset_diagnostics_{partition}.csv", index=False)

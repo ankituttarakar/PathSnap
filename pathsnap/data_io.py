@@ -1,8 +1,9 @@
-"""Data ingestion: readers for the raw PathSnap files.
+"""Read-only ingestion for raw PathSnap trip data.
 
-Parses the four whitespace-separated, header-less file types documented in
-``docs/DATASET_SCHEMA.md`` into typed NumPy arrays. These readers are read-only
-and never modify the raw dataset.
+The training/evaluation loader reads all four whitespace-separated,
+header-less file types documented in ``docs/DATASET_SCHEMA.md``. The separate
+inference loader reads only ``.track``, ``.nodes`` and ``.arcs`` and never
+checks for or opens ``.route``.
 
 File types (0-based row index is the implicit ID where noted)
     .track : lon, lat, timestamp(s)           -> one GPS observation per row
@@ -78,6 +79,29 @@ class Trip:
         return int(self.route.shape[0])
 
 
+@dataclass(frozen=True)
+class InferenceTrip:
+    """Inference input containing no reference-route labels."""
+
+    trip_id: str
+    partition: str
+    track: np.ndarray
+    nodes: np.ndarray
+    arcs: np.ndarray
+
+    @property
+    def n_observations(self) -> int:
+        return int(self.track.shape[0])
+
+    @property
+    def n_nodes(self) -> int:
+        return int(self.nodes.shape[0])
+
+    @property
+    def n_arcs(self) -> int:
+        return int(self.arcs.shape[0])
+
+
 # --------------------------------------------------------------------------- #
 # Low-level file readers
 # --------------------------------------------------------------------------- #
@@ -144,6 +168,57 @@ def load_trip(trip_id: str, partition: str) -> Trip:
         nodes=read_nodes(base.with_suffix(NODES_EXT)),
         arcs=read_arcs(base.with_suffix(ARCS_EXT)),
         route=read_route(base.with_suffix(ROUTE_EXT)),
+    )
+
+
+def load_inference_trip(
+    trip_id: str,
+    partition: str | None = None,
+    *,
+    partition_path: Path | None = None,
+) -> InferenceTrip:
+    """Load inference inputs without checking for or reading a ``.route`` file.
+
+    Exactly one of ``partition`` (resolved through project configuration) or
+    ``partition_path`` (a directory containing per-trip subdirectories) must be
+    provided. This keeps inference data selection explicit.
+    """
+    if (
+        not isinstance(trip_id, str)
+        or len(trip_id) != 8
+        or not trip_id.isascii()
+        or not trip_id.isdigit()
+    ):
+        raise ValueError(f"Invalid trip ID {trip_id!r}; expected 8 decimal digits")
+    if (partition is None) == (partition_path is None):
+        raise ValueError("Provide exactly one of partition or partition_path")
+
+    if partition is not None:
+        root = CONFIG.paths.partition_dir(partition)
+        partition_name = partition
+    else:
+        if partition_path is None:
+            raise ValueError("Provide exactly one of partition or partition_path")
+        root = Path(partition_path)
+        partition_name = root.name
+
+    trip_dir = root / trip_id
+    base = trip_dir / trip_id
+    paths = {
+        "track": base.with_suffix(TRACK_EXT),
+        "nodes": base.with_suffix(NODES_EXT),
+        "arcs": base.with_suffix(ARCS_EXT),
+    }
+    for kind, path in paths.items():
+        if not path.is_file():
+            raise FileNotFoundError(f"Missing inference {kind} file for trip {trip_id}: {path}")
+
+    return InferenceTrip(
+        trip_id=trip_id,
+        partition=partition_name,
+        track=read_track(paths["track"]),
+        nodes=read_nodes(paths["nodes"]),
+        arcs=read_arcs(paths["arcs"]),
     )
 
 

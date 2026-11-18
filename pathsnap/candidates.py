@@ -44,7 +44,7 @@ def generate_candidates(
     tree = cKDTree(pt.arc_mid)
     qk = int(min(query_k, pt.n_arcs))
     _, nn = tree.query(pt.xy, k=qk)       # (N, qk) nearest arc indices by midpoint
-    nn = np.atleast_2d(nn)
+    nn = np.asarray(nn).reshape(pt.n_obs, qk)
 
     obs_list, arc_list, dist_list, t_list, rank_list, ncand_list = [], [], [], [], [], []
     for i in range(pt.n_obs):

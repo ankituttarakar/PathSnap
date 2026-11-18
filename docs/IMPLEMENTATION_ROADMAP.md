@@ -112,17 +112,19 @@ Train **≥5 across families** (Models & Training doc §3):
 
 ## Phase 8 — HMM + Viterbi route reconstruction  — *Report §5*
 - **Hidden states:** candidate arcs per observation (time step = observation).
-- **Emission:** from the tuned classifier's per-candidate probability (+ distance
-  likelihood).
-- **Transition:** network connectivity between candidate arcs (shortest-path /
-  adjacency on the arc graph via `networkx`); penalise disconnected or
-  over-long transitions; special "gap" handling at large Δt (R4).
-- **Viterbi** decode → most likely connected arc sequence; handle missing candidates
-  and invalid transitions.
+- **Emission:** normalized per-observation candidate probabilities from the
+  classifier; the classifier includes 18 inference-time features.
+- **Transition:** stay on the same directed arc with forward progress, or move to
+  a directly connected directed arc. Penalize mismatch between network distance
+  and GPS displacement.
+- **Viterbi** decode; reset at segment gaps, report missing candidates and
+  disconnected-transition fallbacks, and never invent connector arcs.
 - Compare **classifier-only vs classifier+HMM**: pointwise Top-1 Accuracy,
   sequence-level performance, **Route Continuity**; show where HMM helps / hurts.
-- **Output:** `src/pathsnap/hmm.py`, comparison tables + Folium before/after maps.
-- **Guard:** decoder params tuned on train + student_test only.
+- **Output:** `pathsnap/hmm.py`, `scripts/run_hmm_evaluation.py`, and comparison
+  tables/per-trip results under `outputs/experiments/`.
+- **Guard:** train-only GroupKFold for development; student_test is a single
+  final held-out evaluation and is never used to tune decoder parameters.
 
 ## Phase 9 — Folium visualisation  — *Report §6 (mandatory)*
 - Reusable `viz.py`: layers for raw GPS, road network, reference route, predicted

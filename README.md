@@ -27,17 +27,23 @@ over a **FastAPI** backend to an evaluator UI.
   cv,models,evaluation}.py`, driven by `scripts/build_dataset.py` and
   `scripts/run_training.py`. Per-trip UTM projection, gap segmentation, outlier
   flagging, **monotonic route-projection labels** (coverage 96%), KD-tree
-  candidate generation (recall 97%), 12 leakage-safe features, and **5 trained
+  candidate generation (recall 97%), 18 leakage-safe features, and **5 trained
   models** compared under `GroupKFold(trip_id)`. Results in
   `outputs/experiments/`; report at
   [`reports/first_evaluation_report.md`](reports/first_evaluation_report.md).
-  Best so far: Random Forest (CV macro-F1 0.779, student Top-1 0.558). These are
-  **real, reproducible** numbers — classifier-only Top-1 is modest (~0.55, close
-  to a nearest-arc baseline); the sequential gain is expected from the HMM.
+  The current 18-feature Random Forest has train OOF candidate Macro-F1 0.880
+  and observation Top-1 0.818. On the final student holdout, candidate Macro-F1
+  is 0.887 and classifier-only observation Top-1 is 0.833.
+- **HMM/Viterbi baseline:** `pathsnap/hmm.py` decodes classifier emissions over
+  forward-moving, directed candidate arcs. It resets at timestamp segment
+  boundaries and counts disconnected-transition fallbacks without inventing
+  connector arcs. The final student holdout HMM Top-1 is 0.790, with directed
+  transition validity 0.995; continuity improves while pointwise Top-1 falls.
+  Evaluate with `scripts/run_hmm_evaluation.py`; feature specification and
+  detailed results are in `docs/HMM_FEATURE_SPEC.md` and
+  `outputs/experiments/hmm_evaluation.json`.
 
-**Not yet implemented (honest — do NOT assume these exist):** Bayesian HPO
-(Phase 7), HMM/Viterbi sequential decoding (Phase 8), the full prediction
-pipeline (Phase 10), and the frontend (Phase 11). These remain documented stubs.
+**Not yet implemented:** Bayesian HPO (Phase 7) and the frontend (Phase 11).
 Nothing is fabricated; no evaluator data was used.
 
 ## Architecture
@@ -77,7 +83,7 @@ PathSnap-ML/
 │   ├── features.py        # feature engineering                  [Phase 4 stub]
 │   ├── cv.py              # group-aware cross-validation         [Phase 6 stub]
 │   ├── models.py          # model zoo + Bayesian HPO             [Phase 5/7 stub]
-│   ├── hmm.py             # HMM + Viterbi decoding               [Phase 8 stub]
+│   ├── hmm.py             # directed-arc HMM + Viterbi decoding
 │   ├── evaluation.py      # metrics                              [Phase 5/8 stub]
 │   ├── viz.py             # Folium + matplotlib                  [Phase 1/9 stub]
 │   └── pipeline.py        # end-to-end predict(trip_id)          [Phase 10 stub]
