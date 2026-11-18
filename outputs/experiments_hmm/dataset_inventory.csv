@@ -1,0 +1,3 @@
+split,trips,gps_points,median_points,median_nodes,median_arcs,unreliable_labels,max_gap_s,mean_pct_1s
+test,10,19160,1420.0,6596.5,13145.0,27,210.0,0.9819896936551981
+train,80,208417,1529.0,9608.0,19526.5,22553,153064.0,0.9382961036581522

@@ -19,6 +19,9 @@ data/processed/
 # Keep the folder (via outputs/.gitkeep) but ignore everything generated in it.
 outputs/*
 !outputs/.gitkeep
+# Keep the compact, reproducible model/HMM result summaries in version control.
+!outputs/experiments_hmm/
+!outputs/experiments_hmm/**
 # Serialized model/artifact blobs anywhere in the tree.
 *.joblib
 *.pkl
