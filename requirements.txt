@@ -1,0 +1,40 @@
+# PathSnap dependencies
+# Pinned with lower bounds matching the verified local environment
+# (Python 3.12.10). Install into a virtual environment:
+#   python -m venv .venv
+#   .venv\Scripts\pip install -r requirements.txt   (Windows)
+#   source .venv/bin/activate && pip install -r requirements.txt  (Unix)
+
+# --- Core numerics / data ---
+numpy>=2.5
+pandas>=3.1
+scipy>=1.18
+
+# --- Machine learning ---
+scikit-learn>=1.9
+optuna>=5.1            # Bayesian hyperparameter optimisation (TPE)
+joblib>=1.6            # model/artifact (de)serialisation
+
+# --- Geospatial ---
+pyproj>=3.8            # per-trip CRS projection
+shapely>=2.2           # arc geometry + spatial predicates
+geopandas>=1.2         # geospatial dataframes
+haversine>=2.9         # geodesic distances
+networkx>=3.7          # road-network graph + connectivity for HMM transitions
+
+# --- Visualisation ---
+matplotlib>=3.11
+seaborn>=0.13
+folium>=1.0            # mandatory interactive maps
+
+# --- API (Laptop 1) ---
+fastapi>=0.163
+uvicorn>=0.54
+
+# --- Tooling ---
+tqdm>=4.70
+jupyter>=1.0           # notebooks for EDA / experiments
+
+# NOTE: boosting libraries (xgboost / lightgbm / catboost) are intentionally
+# NOT included yet. Add them only if a boosting model beyond scikit-learn's
+# HistGradientBoosting is actually used in Phase 5 (avoid unnecessary deps).

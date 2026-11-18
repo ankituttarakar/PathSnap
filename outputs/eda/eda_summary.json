@@ -1,0 +1,102 @@
+{
+  "train": {
+    "n_trips": 80,
+    "total_observations": 208417,
+    "n_obs_min": 361.0,
+    "n_obs_median": 1529.0,
+    "n_obs_mean": 2605.2125,
+    "n_obs_max": 19313.0,
+    "n_obs_std": 3312.3453990910652,
+    "n_nodes_min": 299.0,
+    "n_nodes_median": 9608.0,
+    "n_nodes_mean": 24168.5625,
+    "n_nodes_max": 155003.0,
+    "n_nodes_std": 32272.296271791263,
+    "n_arcs_min": 649.0,
+    "n_arcs_median": 19526.5,
+    "n_arcs_mean": 48461.3,
+    "n_arcs_max": 307392.0,
+    "n_arcs_std": 64738.836889517836,
+    "route_len_min": 59.0,
+    "route_len_median": 280.0,
+    "route_len_mean": 391.7,
+    "route_len_max": 2266.0,
+    "route_len_std": 361.1654973217904,
+    "bbox_diag_km_min": 1.4172562889870928,
+    "bbox_diag_km_median": 9.544230508938128,
+    "bbox_diag_km_mean": 19.830203087100983,
+    "bbox_diag_km_max": 78.50703481035816,
+    "bbox_diag_km_std": 20.573370286065195
+  },
+  "student_test": {
+    "n_trips": 10,
+    "total_observations": 19160,
+    "n_obs_min": 262.0,
+    "n_obs_median": 1420.0,
+    "n_obs_mean": 1916.0,
+    "n_obs_max": 3958.0,
+    "n_obs_std": 1335.4323478018478,
+    "n_nodes_min": 1770.0,
+    "n_nodes_median": 6596.5,
+    "n_nodes_mean": 9068.9,
+    "n_nodes_max": 26635.0,
+    "n_nodes_std": 7452.176034928023,
+    "n_arcs_min": 3577.0,
+    "n_arcs_median": 13145.0,
+    "n_arcs_mean": 18504.1,
+    "n_arcs_max": 56027.0,
+    "n_arcs_std": 15496.930480653975,
+    "route_len_min": 95.0,
+    "route_len_median": 250.0,
+    "route_len_mean": 347.7,
+    "route_len_max": 1323.0,
+    "route_len_std": 359.574146271206,
+    "bbox_diag_km_min": 4.277912030516929,
+    "bbox_diag_km_median": 7.243337734720564,
+    "bbox_diag_km_mean": 14.256968041907419,
+    "bbox_diag_km_max": 48.310572965889165,
+    "bbox_diag_km_std": 14.337151220675675
+  },
+  "representative_trips": {
+    "typical": {
+      "trip_id": "00000083",
+      "path": "outputs\\maps\\trip_00000083_typical.html"
+    },
+    "dense_network": {
+      "trip_id": "00000013",
+      "path": "outputs\\maps\\trip_00000013_dense_network.html"
+    },
+    "gps_anomaly": {
+      "trip_id": "00000055",
+      "path": "outputs\\maps\\trip_00000055_gps_anomaly.html"
+    }
+  },
+  "route_connectivity": {
+    "train_trips_fully_connected": 71,
+    "train_min_frac_connected": 0.9813084112149533,
+    "train_mean_frac_connected": 0.9993461551444497,
+    "train_total_broken_links": 13,
+    "st_trips_fully_connected": 9,
+    "st_mean_frac_connected": 0.9997319034852546
+  },
+  "data_quality": {
+    "train_total_gaps_gt_1s": 7286,
+    "train_max_gap_s": 153064.0,
+    "train_total_dup_timestamps": 0,
+    "train_total_nonmonotonic": 0,
+    "train_trips_with_confirmed_jump_error": 0,
+    "train_total_confirmed_jump_errors": 0,
+    "train_total_invalid_endpoint_refs": 0,
+    "train_total_invalid_arc_refs": 0,
+    "train_total_self_loops": 22,
+    "train_total_isolated_nodes": 0,
+    "train_trips_single_component": 1
+  },
+  "charts": [
+    "outputs\\eda\\observations_per_trip.png",
+    "outputs\\eda\\timestamp_interval_distribution.png",
+    "outputs\\eda\\gps_speed_distribution.png",
+    "outputs\\eda\\network_size_distribution.png",
+    "outputs\\eda\\route_length_distribution.png"
+  ]
+}
