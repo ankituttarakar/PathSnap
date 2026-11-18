@@ -22,16 +22,23 @@ over a **FastAPI** backend to an evaluator UI.
   at [`reports/phase1_eda_report.md`](reports/phase1_eda_report.md). All 90 trips
   analysed (80 train fully; 10 student_test kept strictly separate).
 
-**Not yet implemented (honest — do NOT assume these exist):** preprocessing,
-geographic projection, observation→arc **label derivation**, candidate
-generation, feature engineering, ML models, Bayesian HPO, HMM/Viterbi, the full
-prediction pipeline, and the frontend. These modules are present only as
-documented stubs that raise `NotImplementedError`.
+- **Phase 2–5 — preprocessing → labels → candidates → features → 5-model
+  comparison (runnable):** `pathsnap/{geo,preprocess,labels,candidates,features,
+  cv,models,evaluation}.py`, driven by `scripts/build_dataset.py` and
+  `scripts/run_training.py`. Per-trip UTM projection, gap segmentation, outlier
+  flagging, **monotonic route-projection labels** (coverage 96%), KD-tree
+  candidate generation (recall 97%), 12 leakage-safe features, and **5 trained
+  models** compared under `GroupKFold(trip_id)`. Results in
+  `outputs/experiments/`; report at
+  [`reports/first_evaluation_report.md`](reports/first_evaluation_report.md).
+  Best so far: Random Forest (CV macro-F1 0.779, student Top-1 0.558). These are
+  **real, reproducible** numbers — classifier-only Top-1 is modest (~0.55, close
+  to a nearest-arc baseline); the sequential gain is expected from the HMM.
 
-**No model has been trained and no model metrics exist yet.** Label derivation is
-deliberately deferred: the observation→arc labelling rule must be designed and
-verified in Phase 2 before any supervised model is trained (see the EDA report's
-open questions). No results are fabricated.
+**Not yet implemented (honest — do NOT assume these exist):** Bayesian HPO
+(Phase 7), HMM/Viterbi sequential decoding (Phase 8), the full prediction
+pipeline (Phase 10), and the frontend (Phase 11). These remain documented stubs.
+Nothing is fabricated; no evaluator data was used.
 
 ## Architecture
 
